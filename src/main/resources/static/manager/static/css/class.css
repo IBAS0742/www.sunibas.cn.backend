@@ -1,0 +1,52 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/*body,*/
+/*.class-div::before {*/
+/*    background: url('./../images/bing.jpg') no-repeat center fixed;*/
+/*    background-size: cover;*/
+/*}*/
+body {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.class-div {
+    position: relative;
+    width: 60%;
+    height: auto;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px 1px #fff;
+    color: #fff;
+    font-size: 15px;
+    font-weight: lighter;
+    line-height: 35px;
+    overflow: hidden;
+    background: radial-gradient(rgba(0,0,0,0) 0%,rgb(0 0 0 / 7%) 100%),radial-gradient(rgba(0,0,0,0) 33%,rgb(0 0 0 / 26%) 166%)
+}
+.class-div::before {
+    content: '';
+    display: block;
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: -20px;
+    filter: blur(10px);
+}
+h2 {
+    text-align:center;
+    color:#333;
+}
+p {
+    font-size:18px;
+    color:#FFFFFF;
+    text-decoration:underline;
+}

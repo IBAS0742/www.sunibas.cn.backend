@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-WeAdmin Frame型后台管理系统-WeAdmin 1.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../static/css/font.css">
+    <link rel="stylesheet" href="../static/css/weadmin.css">
+</head>
+
+<body>
+<div class="weadmin-body">
+    <blockquote class="layui-elem-quote">数据集管理</blockquote>
+    <div class="layui-tab" lay-filter="tab">
+        <ul class="layui-tab-title">
+            <li lay-id="list" class="layui-this">列表</li>
+            <li lay-id="create">新增</li>
+            <li lay-id="update">修改</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <div id="table"></div>
+            </div>
+            <div class="layui-tab-item">
+                <div id="createForm"></div>
+            </div>
+            <div class="layui-tab-item">
+                <div id="updateForm"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../json/utils.js" charset="utf-8"></script>
+<script type="text/javascript" src="../json/apis.js" charset="utf-8"></script>
+<script type="text/javascript" src="../json/Dao.js" charset="utf-8"></script>
+<script type="text/javascript" src="../json/DataSourceDao.js" charset="utf-8"></script>
+<script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="../static/js/mockStatic.js" charset="utf-8"></script>
+<script type="text/javascript" src="../static/js/OpenMap.js" charset="utf-8"></script>
+<script type="text/javascript" src="../static/js/form.js" charset="utf-8"></script>
+<script type="text/javascript" src="../static/js/StaticTable.js" charset="utf-8"></script>
+<script type="text/javascript">
+    layui.extend({
+        admin: '{/}../static/js/admin',
+    });
+    layui.use(['jquery', 'element','util', 'admin', 'laypage','table','layer','form'], function() {
+        var table = layui.table;
+        var form = layui.form;
+        var laypage = layui.laypage;
+        var jquery = layui.jquery;
+        var layer = layui.layer;
+        var element = layui.element;
+        window.jquery = window.$ = jquery;
+        let bandStaticTable = new StaticTable().addColumn("name","波段名").addColumn("number","条带号").addColumn("wavelength","波长");
+        let compositeStaticTable = new StaticTable().addColumn("label","名称").addColumn("value","红色",_ => _.redBand).addColumn("value","绿色",_ => _.greenBand).addColumn("value","蓝色",_ => _.blueBand);
+
+        window.createForm = null;
+        window.updateForm = null;
+
+        let pc = new ParseColumn()
+            // todo : 开始设置表格字段
+            .add("id","id",null,ParseColumn.setting(340))
+            .add("createdAt","创建时间")
+            .add("name","名称")
+            .add("visibility","可见性")
+            .addButton("查看属性和描述","properties",[].concat(ParseColumn.btnStyle.small).concat(ParseColumn.btnStyle.danger),function(obj) {
+                // let bands = JSON.stringify(obj.bands,'','\t').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\n/g,'<br/>');
+                let bands = bandStaticTable.getTable(obj.bands);
+                // let composites = JSON.stringify(obj.composites,'','\t').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\n/g,'<br/>');
+                let composites = compositeStaticTable.getTable(obj.composites);
+                let extras = JSON.stringify(obj.extras,'','\t').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\n/g,'<br/>');
+                let layerId = layer.open({
+                    closeBtn: 1,
+                    btn: [],
+                    area: ['80%'],
+                    title: `属性和描述[id=${obj.id}]`,
+                    content: `<div>条带信息：<br/>${bands}<br/>颜色组合：<br/>${composites}<br/>其他内容：<br/>${extras}</div>`
+                });
+                let contentDom = $(`.layui-layer[times=${layerId}]`).find('.layui-layer-content')[0];
+                contentDom.innerHTML = contentDom.innerHTML.replace(/[,]{4,}/g,'')
+            })
+            .addButton("修改","update",[].concat(ParseColumn.btnStyle.small).concat(ParseColumn.btnStyle.normal),function (obj) {
+                if (window.updateForm) {
+                    // todo : 这里设置表单字段
+                    // updateForm.formItem[0].setValue(obj.id);
+                    let composites = [];
+                    for (let i in obj.composites) {
+                        let o = {
+                            label: obj.composites[i].label,
+                            ...obj.composites[i].value
+                        };
+                        composites.push(o);
+                    }
+                    updateForm.setValue("id",obj.id);
+                    updateForm.setValue("name",obj.name);
+                    updateForm.setValue("visibility",obj.visibility);
+                    updateForm.setValue("bands",obj.bands);
+                    updateForm.setValue("extras",obj.extras);
+                    updateForm.setValue("composites",composites);
+                    element.tabChange('tab', "update");
+                }
+            })
+            .addButton("删除","delete",[].concat(ParseColumn.btnStyle.small).concat(ParseColumn.btnStyle.danger),function (obj) {
+                layer.confirm('确认删除?', {icon: 3, title:'提示'}, function(index) {
+                    DataSourceDao.delete(obj.id);
+                    layer.msg("已执行删除");
+                    layer.close(index);
+                    window.loading.load("正在加载");
+                    setTimeout(() => {
+                        window.mp.getPage();
+                    },1000);
+                });
+            })
+            .setButtonSetting(ParseColumn.setting(400))
+            .init();
+        window.mp = new MockStaticPagination(
+            document.getElementById('table'),
+            {table,laypage,jquery},
+            DataSourceDao.list.bind(DataSourceDao),pc,
+            // todo : 有些查询可能是返回 results 或 features 或 list
+            "results",0);
+        mp.getPage();
+
+        window.$ = $;
+        window.initCreateForm = function() {
+            window.createForm
+                .render()
+                .setValue("visibility","PUBLIC")
+                .setValue("composites",[{"blueBand":2,"label":"default","greenBand":1,"redBand":0}])
+                .setValue("bands",[{"name":"red","number":"0","wavelength":100},{"name":"green","number":"1","wavelength":200},{"name":"blue","number":"2","wavelength":300}]);
+        }
+        window.createForm = new Form("createForm",form,layer,function (obj) {
+            console.log(obj);
+            window.loading.load("正在提交");
+
+            DataSourceDao.insert(obj.name,obj.visibility,obj.extras,obj.bands,obj.composites)
+                .then(_ => {
+                    window.loading.close();
+                    // _ = _.length;
+                    let char = [`<i style="color:#e91e63;" class="layui-icon">&#x1006;</i>`,`<i style="color:#03a9f4;" class="layui-icon">&#xe6c6;</i>`];
+                    layer.msg(`${char[+_]}成功插入了 ${_} 条记录`);
+                    // todo : 这里插入成功后初始化 表单，防止重复插入
+                    window.createForm.render();
+                });
+        })
+            // todo : 这里开始编写创建表单的字段
+            .addFormItem(new Input("名称","name"),[Form.checkDatasMethods.required()])
+            .addFormItem(new Input("可见性","visibility","",true),[Form.checkDatasMethods.required()])
+            .addFormItem(
+                new MapArrayInput("条带信息","bands")
+                    .addField("name","波段名")
+                    .addField("number","条带号")
+                    .addField("wavelength","波长"))
+            .addFormItem(
+                new MapArrayInput("颜色组合","composites")
+                    .addField("label","组合名称")
+                    .addField("redBand","红色")
+                    .addField("greenBand","绿色")
+                    .addField("blueBand","蓝色"))
+            .addFormItem(
+                new MapInput("其他信息","extras"),
+                _ => {
+                    if (_.source === "") {
+                        return new Error(`source 字段不能为空，这个是描述这个要素的来源`);
+                    }
+                });
+        initCreateForm();
+        window.updateForm = new Form("updateForm",form,layer,
+            function (obj) {
+                console.log(obj);
+                window.loading.load("正在提交");
+                DataSourceDao.update(obj.id,obj.name,obj.visibility,obj.extras,obj.bands,obj.composites)
+                    .then(_ => _.text())
+                    .then(_ => {
+                        window.loading.close();
+                        let char = [`<i style="color:#03a9f4;" class="layui-icon">&#xe6c6;</i>`,`<i style="color:#e91e63;" class="layui-icon">&#x1006;</i>`];
+                        layer.msg(`${char[+_]}${_} 条记录更新成功`);
+                    });
+            })
+            // todo : 这里开始编写更新表单的字段
+            .addFormItem(new Input("id","id",null,true))
+            .addFormItem(new Input("名称","name"),[Form.checkDatasMethods.required()])
+            .addFormItem(new Input("可见性","visibility","",true),[Form.checkDatasMethods.required()])
+            .addFormItem(
+                new MapArrayInput("条带信息","bands")
+                    .addField("name","波段名")
+                    .addField("number","条带号")
+                    .addField("wavelength","波长"))
+            .addFormItem(
+                new MapArrayInput("颜色组合","composites")
+                    .addField("label","组合名称")
+                    .addField("redBand","红色")
+                    .addField("greenBand","绿色")
+                    .addField("blueBand","蓝色"))
+            .addFormItem(
+                new MapInput("其他信息","extras"),
+                _ => {
+                    if (_.source === "") {
+                        return new Error(`source 字段不能为空，这个是描述这个要素的来源`);
+                    }
+                })
+            .render();
+    });
+</script>
+
+</html>

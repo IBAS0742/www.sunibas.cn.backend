@@ -1,0 +1,9 @@
+
+在 mapper 中添加以下映射
+
+<insert id="insertRetId" parameterType="com.company.project.model.User" >
+    <selectKey keyProperty="id" order="AFTER" resultType="int">
+    select LAST_INSERT_ID()
+    </selectKey>
+    INSERT INTO USER(username,password,nick_name,sex,register_date) VALUES(#{username},#{password},#{nickName},#{sex},#{registerDate})
+</insert>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>欢迎页面-WeAdmin Frame型后台管理系统-WeAdmin 1.0</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../static/css/font.css">
+		<link rel="stylesheet" href="../static/css/weadmin.css">
+	</head>
+
+	<body>
+		<div class="weadmin-body">
+			<blockquote class="layui-elem-quote">矢量 <button class="layui-btn layui-btn-sm layui-btn-normal" tar="openMap">打开地图</button></blockquote>
+			<div class="layui-tab" lay-filter="tab">
+				<ul class="layui-tab-title">
+					<li lay-id="list" class="layui-this">列表</li>
+					<li lay-id="create">新增</li>
+					<li lay-id="update">修改</li>
+				</ul>
+				<div class="layui-tab-content">
+					<div class="layui-tab-item layui-show">
+						<div id="table"></div>
+					</div>
+					<div class="layui-tab-item">
+						<div id="createForm"></div>
+					</div>
+					<div class="layui-tab-item">
+						<button></button>
+						<div id="updateForm"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript" src="../json/utils.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../json/apis.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../json/Dao.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../json/ShapeDao.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../static/js/mockStatic.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../static/js/OpenMap.js" charset="utf-8"></script>
+	<script type="text/javascript" src="../static/js/form.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		layui.extend({
+			admin: '{/}../static/js/admin',
+		});
+		layui.use(['jquery', 'element','util', 'admin', 'laypage','table','layer','form'], function() {
+			var table = layui.table;
+			var form = layui.form;
+			var laypage = layui.laypage;
+			var jquery = layui.jquery;
+			var layer = layui.layer;
+			var element = layui.element;
+			window.jquery = window.$ = jquery;
+
+			window.createForm = null;
+			window.updateForm = null;
+			window.openMap = new OpenMap(layer,'./../lib/leaflet/map.html',{
+				upload(geo) {
+					if (window.createForm) {
+						window.createForm.setValue('geoJSON',JSON.stringify(geo.geometry));
+					}
+					if (window.updateForm) {
+						window.updateForm.setValue('geoJSON',JSON.stringify(geo.geometry));
+					}
+				}
+			});
+
+			$(`[tar="openMap"]`).on('click',function () {
+				window.openMap.open();
+			});
+
+			let pc = new ParseColumn()
+					.add("id","id",null,ParseColumn.setting(340))
+					.add("type","type")
+					.add("properties","地名",_ => _.name,null,ParseColumn.setting(300))
+					// .add("properties","创建时间",_ => _.createdAt)
+					.add("geometry","geometryType",_ => _.type,null,ParseColumn.setting(300))
+					.addButton("在地图中查看","look",[].concat(ParseColumn.btnStyle.small).concat(ParseColumn.btnStyle.warn),function(obj) {
+						window.openMap.open(function (om) {
+							// om 就是 openMap
+							om.addGeoJson(obj);
+						});
+					})
+					.addButton("查看属性和描述","properties",[].concat(ParseColumn.btnStyle.small).concat(ParseColumn.btnStyle.danger),function(obj) {
+						let str0 = JSON.stringify(obj.properties,'','\t').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\n/g,'<br/>');
+						let str1 = JSON.stringify(obj.description.kv,'','\t').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').replace(/\n/g,'<br/>');
+						layer.open({
+							btn: [],
+							area: ['80%'],
+							title: `属性和描述[id=${obj.id}]`,
+							content: `<div>属性<br/>${str0}<br/>描述<br/>${str1}</div>`
+						});
+					})
+					.addButton("修改","update",[].concat(ParseColumn.btnStyle.small).concat(ParseColumn.btnStyle.normal),function (obj) {
+						// todo...
+						if (window.updateForm) {
+							updateForm.formItem[0].setValue(obj.id);
+							updateForm.formItem[1].setValue(obj.properties.createdAt);
+							updateForm.formItem[2].setValue(JSON.stringify(obj.geometry));
+							updateForm.formItem[3].setValue(obj.properties.name);
+							let o = {};
+							for (let i in obj.description.kv) {
+								o[i] = {
+									value: obj.description.kv[i],
+									cannotDelete: (i === 'source')
+								};
+							}
+							updateForm.formItem[4].setValue(o);
+							element.tabChange('tab', "update");
+						}
+					})
+					.addButton("删除","delete",[].concat(ParseColumn.btnStyle.small).concat(ParseColumn.btnStyle.danger),function (obj) {
+						layer.confirm('确认删除?', {icon: 3, title:'提示'}, function(index) {
+							ShapeDao.delete(obj.id);
+							layer.msg("已执行删除");
+							layer.close(index);
+							window.loading.load("正在加载");
+							setTimeout(() => {
+								window.mp.getPage();
+							},1000);
+						});
+					})
+					.setButtonSetting(ParseColumn.setting(400))
+					.init();
+			window.mp = new MockStaticPagination(document.getElementById('table'),{table,laypage,jquery},ShapeDao.list.bind(ShapeDao),pc,"features",0)
+			mp.getPage();
+
+			window.$ = $;
+			window.createForm = new Form("createForm",form,layer,function (obj) {
+						console.log(obj);
+						window.loading.load("正在提交");
+						ShapeDao.insert(obj.geoJSON,obj.name,obj.description)
+						.then(_ => {
+							window.loading.close();
+							_ = _.length;
+							let char = [`<i style="color:#e91e63;" class="layui-icon">&#x1006;</i>`,`<i style="color:#03a9f4;" class="layui-icon">&#xe6c6;</i>`];
+							layer.msg(`${char[+_]}成功插入了 ${_} 条记录`);
+						});
+					})
+					.addFormItem(new TextArea("GeoJSON","geoJSON"),[Form.checkDatasMethods.required(),checkIsGeoJSON])
+					.addFormItem(new Input("名称","name"),[Form.checkDatasMethods.required()])
+					.addFormItem(
+							new MapInput("描述","description").addKeyValue("source","web",true),
+							_ => {
+								if (_.source === "") {
+									return new Error(`source 字段不能为空，这个是描述这个要素的来源`);
+								}
+							})
+					.render();
+			window.updateForm = new Form("updateForm",form,layer,
+					function (obj) {
+						console.log(obj);
+						window.loading.load("正在提交");
+						ShapeDao.update(obj.id,obj.geoJSON,obj.name,obj.description,null,obj.createdAt)
+								.then(_ => _.text())
+								.then(_ => {
+									window.loading.close();
+									let char = [`<i style="color:#e91e63;" class="layui-icon">&#x1006;</i>`,`<i style="color:#03a9f4;" class="layui-icon">&#xe6c6;</i>`];
+									layer.msg(`${char[+_]}${_} 条记录更新成功`);
+								});
+					})
+					.addFormItem(new Input("id","id",null,true))
+					.addFormItem(new Input("创建时间","createdAt",null,true))
+					.addFormItem(new TextArea("GeoJSON","geoJSON"),[Form.checkDatasMethods.required(),checkIsGeoJSON])
+					.addFormItem(new Input("名称","name"),[Form.checkDatasMethods.required()])
+					.addFormItem(
+							new MapInput("描述","description"),
+							_ => {
+								if (_.source === "") {
+									return new Error(`source 字段不能为空，这个是描述这个要素的来源`);
+								}
+							})
+					.render();
+		});
+	</script>
+
+</html>

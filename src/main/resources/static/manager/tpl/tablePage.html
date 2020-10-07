@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-WeAdmin Frame型后台管理系统-WeAdmin 1.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../static/css/font.css">
+    <link rel="stylesheet" href="../static/css/weadmin.css">
+</head>
+
+<body>
+<div class="weadmin-body">
+    <blockquote class="layui-elem-quote">##page_title##</blockquote>
+    <div class="layui-tab" lay-filter="tab">
+        <ul class="layui-tab-title">
+            <li lay-id="list" class="layui-this">列表</li>
+            <li lay-id="create">新增</li>
+            <li lay-id="update">修改</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <div id="table"></div>
+            </div>
+            <div class="layui-tab-item">
+                <div id="createForm"></div>
+            </div>
+            <div class="layui-tab-item">
+                <button></button>
+                <div id="updateForm"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../json/utils.js" charset="utf-8"></script>
+<script type="text/javascript" src="../json/apis.js" charset="utf-8"></script>
+<script type="text/javascript" src="../json/Dao.js" charset="utf-8"></script>
+<script type="text/javascript" src="../json##dao_name##Dao.js" charset="utf-8"></script>
+<script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="../static/js/mockStatic.js" charset="utf-8"></script>
+<script type="text/javascript" src="../static/js/OpenMap.js" charset="utf-8"></script>
+<script type="text/javascript" src="../static/js/form.js" charset="utf-8"></script>
+<script type="text/javascript">
+    layui.extend({
+        admin: '{/}../static/js/admin',
+    });
+    layui.use(['jquery', 'element','util', 'admin', 'laypage','table','layer','form'], function() {
+        var table = layui.table;
+        var form = layui.form;
+        var laypage = layui.laypage;
+        var jquery = layui.jquery;
+        var layer = layui.layer;
+        var element = layui.element;
+        window.jquery = window.$ = jquery;
+
+        window.createForm = null;
+        window.updateForm = null;
+
+        let pc = new ParseColumn()
+            // todo : 开始设置表格字段
+            .add("id","id",null,ParseColumn.setting(340))
+            // .add("type","type")
+            // .add("properties","地名",_ => _.name,null,ParseColumn.setting(300))
+            // // .add("properties","创建时间",_ => _.createdAt)
+            // .add("geometry","geometryType",_ => _.type,null,ParseColumn.setting(300))
+            .addButton("修改","update",[].concat(ParseColumn.btnStyle.small).concat(ParseColumn.btnStyle.normal),function (obj) {
+                if (window.updateForm) {
+                    // todo : 这里设置表单字段
+                    updateForm.formItem[0].setValue(obj.id);
+                    // updateForm.formItem[1].setValue(obj.properties.createdAt);
+                    // updateForm.formItem[2].setValue(JSON.stringify(obj.geometry));
+                    // updateForm.formItem[3].setValue(obj.properties.name);
+                    element.tabChange('tab', "update");
+                }
+            })
+            .addButton("删除","delete",[].concat(ParseColumn.btnStyle.small).concat(ParseColumn.btnStyle.danger),function (obj) {
+                layer.confirm('确认删除?', {icon: 3, title:'提示'}, function(index) {
+                    ##dao_name##Dao.delete(obj.id);
+                    layer.msg("已执行删除");
+                    layer.close(index);
+                    window.loading.load("正在加载");
+                    setTimeout(() => {
+                        window.mp.getPage();
+                    },1000);
+                });
+            })
+            .setButtonSetting(ParseColumn.setting(400))
+            .init();
+        window.mp = new MockStaticPagination(
+            document.getElementById('table'),
+            {table,laypage,jquery},
+            ##dao_name##Dao.list.bind(##dao_name##Dao),pc,
+            // todo : 有些查询可能是返回 results 或 features 或 list
+            "results",0);
+        mp.getPage();
+
+        window.$ = $;
+        window.createForm = new Form("createForm",form,layer,function (obj) {
+            console.log(obj);
+            window.loading.load("正在提交");
+            ##dao_name##Dao.insert(obj.geoJSON,obj.name,obj.description)
+                .then(_ => {
+                    window.loading.close();
+                    // _ = _.length;
+                    let char = [`<i style="color:#e91e63;" class="layui-icon">&#x1006;</i>`,`<i style="color:#03a9f4;" class="layui-icon">&#xe6c6;</i>`];
+                    layer.msg(`${char[+_]}成功插入了 ${_} 条记录`);
+                    // todo : 这里插入成功后初始化 表单，防止重复插入
+                    window.createForm.render();
+                });
+        })
+            // todo : 这里开始编写创建表单的字段
+            // .addFormItem(new TextArea("GeoJSON","geoJSON"),[Form.checkDatasMethods.required(),checkIsGeoJSON])
+            // .addFormItem(new Input("名称","name"),[Form.checkDatasMethods.required()])
+            .render();
+        window.updateForm = new Form("updateForm",form,layer,
+            function (obj) {
+                console.log(obj);
+                window.loading.load("正在提交");
+                ##dao_name##Dao.update(obj.id,obj.geoJSON,obj.name,obj.description,null,obj.createdAt)
+                    .then(_ => _.text())
+                    .then(_ => {
+                        window.loading.close();
+                        let char = [`<i style="color:#03a9f4;" class="layui-icon">&#xe6c6;</i>`,`<i style="color:#e91e63;" class="layui-icon">&#x1006;</i>`];
+                        layer.msg(`${char[+_]}${_} 条记录更新成功`);
+                    });
+            })
+            // todo : 这里开始编写更新表单的字段
+            .addFormItem(new Input("id","id",null,true))
+            // .addFormItem(new Input("创建时间","createdAt",null,true))
+            // .addFormItem(new TextArea("GeoJSON","geoJSON"),[Form.checkDatasMethods.required(),checkIsGeoJSON])
+            // .addFormItem(new Input("名称","name"),[Form.checkDatasMethods.required()])
+            .render();
+    });
+</script>
+
+</html>

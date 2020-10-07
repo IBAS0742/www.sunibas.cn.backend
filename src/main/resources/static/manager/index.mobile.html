@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/layer/3.1.1/layer.js"></script>
+</head>
+<body>
+</body>
+<script>
+    window.onload = function () {
+        let android = navigator.userAgent.includes('Linux');
+        if (android) {
+            layer.confirm('是否切换为手机端？', {
+                btn: ['是','否'] //可以无限个按钮
+            }, function(index){
+                location.href = "index.mobile.html"
+                layer.close(index);
+            }, function(index){
+                layer.close(index);
+            });
+        }
+    }
+</script>
+</html>

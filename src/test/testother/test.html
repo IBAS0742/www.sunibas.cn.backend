@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="//at.alicdn.com/t/font_2114797_y92kwe9h0w.js"></script>
+    <style>
+        .icon {
+            width: 1em; height: 1em;
+            vertical-align: -0.15em;
+            fill: currentColor;
+            overflow: hidden;
+        }
+        * {
+            box-sizing: border-box;
+            outline: none;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            touch-action: pan-y
+        }
+        html {
+            height: 100%
+        }
+        body {
+            max-width: 100%;
+            overflow: hidden;
+            margin: 0;
+            font-family: microsoft yahei light,microsoft yahei,PingFangSC-Regular,Helvetica,sans-serif,ç­‰çº¿;
+            /*background: url("https://cn.bing.com/th?id=OHR.YunchengSaltLake_ZH-CN2717775996_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp") no-repeat center fixed;*/
+            background-size: cover;
+            cursor: default;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none
+        }
+        #bodyBox{
+            z-index: -2;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: all .25s;
+        }
+        .navbox {
+            animation: fadeIn .25s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            display: none;
+            transition: all .25s;
+        }
+        .navbox0 {
+            position: absolute;
+            margin-top: 200px;
+            left: calc(50% - 330px);
+            width: 660px;
+            height: calc(100vh - 330px);
+            overflow: hidden;
+        }
+        #navbox1 {
+            left: 0;
+            height: 100%;
+        }
+        .navboxes {
+            position: absolute;
+            width: 100%;
+            overflow: hidden;
+            transition: all .25s ease-in-out;
+        }
+        #navboxCustom {
+            height: 100%;
+            margin: 0 auto;
+            max-width: 650px;
+            text-align: left;
+            color: #fff;
+            font-size: 0;
+            overflow-y: auto;
+            transition: all .25s;
+        }
+        #presetNavsArea {
+            display: inline;
+        }
+        .customNav.added {
+            background-color: #ffffff80;
+        }
+        .customNav {
+            position: relative;
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            margin: 25px;
+            margin-top: 10px;
+            margin-bottom: 40px;
+            border-radius: 10px;
+            text-align: center;
+            background-color: #ffffff80;
+            cursor: pointer;
+            transition: background-color .35s;
+        }
+        .cusNavTitle {
+            bottom: -25px;
+            color: #fff;
+            font-size: 10px;
+            left: 5%;
+            overflow: hidden;
+            position: absolute;
+            text-align: center;
+            text-overflow: ellipsis;
+            transition: all .25s;
+            white-space: nowrap;
+            width: 90%;
+        }
+        .cover {
+            z-index: -1;
+            opacity: 0;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(0,0,0,0) 0%,rgba(0,0,0,0.5) 100%),radial-gradient(rgba(0,0,0,0) 33%,rgba(0,0,0,0.3) 166%);
+            transition: all .25s;
+        }
+        .bgbox {
+            display: none;
+            opacity: 0;
+            z-index: -3;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 1s,transform .25s,filter .25s;
+            backface-visibility: hidden;
+            filter: blur(2px);
+        }
+        #presetNavsArea .cusNavIcon {
+            width: 26px;
+            height: 26px;
+            margin-top: -13px;
+            margin-left: -13px;
+            border-radius: 0;
+            font-size: 26px;
+        }
+        .cusNavIcon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            margin-top: -12px;
+            margin-left: -12px;
+            border: none;
+            border-radius: 3px;
+            background-position: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: all .25s;
+            -webkit-touch-callout: none;
+            -webkit-user-drag: none;
+        }
+        .title {
+            position: fixed;
+            top: 115px;
+            left: 50%;
+            margin-left: -50px;
+            width: 100px;
+            text-align: center;
+            transition: all .25s;
+        }
+        h1 {
+            color: #fff;
+            font-size: 36px;
+            font-weight: inherit;
+            text-shadow: 0 0 20px rgba(0,0,0,.35);
+            cursor: pointer;
+            transition: all .25s;
+            line-height: 20px;
+            animation-name: delayedFadeIn;
+            animation-duration: 2s;
+            animation-iteration-count: 1;
+            animation-delay: 0s;
+        }
+    </style>
+</head>
+<body>
+
+
+<div id="bodyBox">
+    <img class="bgbox" id="bgbox" alt="" src="https://cn.bing.com/th?id=OHR.PRookery_ZH-CN2608301001_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp" style="display: block;opacity: 1;transform: scale(1.1);">
+    <div class="cover" id="cover" style="opacity: 1;"></div>
+    <div class="navbox" id="navbox" style="display: block;">
+        <div class="navbox0" id="navbox0">
+            <div class="navboxes" id="navbox1">
+                <div id="navboxCustom" class="shouldNotSwitch">
+                    <div id="presetNavsArea" class="shouldNotSwitch">
+                        <div class="customNav shouldNotFade shouldNotSwitch added">
+                            <i class="cusNavIcon iconfont shouldNotFade shouldNotSwitch" style="color: rgb(45, 149, 191);"></i>
+                            <div class="cusNavTitle shouldNotFade shouldNotSwitch">翻译</div>
+                        </div>
+                        <div class="customNav shouldNotFade shouldNotSwitch added">
+                            <svg class="icon cusNavIcon" aria-hidden="true">
+                                <use xlink:href="#icon-zixun"></use>
+                            </svg>
+                            <div class="cusNavTitle shouldNotFade shouldNotSwitch">地图</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="title" id="title" style="transform: scale(1);"><h1 id="titleText">17:02</h1></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/layer/3.1.1/layer.js"></script>
+<script>
+
+</script>
+
+</body>
+</html>

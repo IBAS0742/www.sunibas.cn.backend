@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>登录</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="all,follow">
+    <link rel="stylesheet" href="https://www.jq22.com/jquery/bootstrap-4.2.1.css">
+    <link rel="stylesheet" href="./static/css/login.style.default.css" id="theme-stylesheet">
+    <style>
+        *{
+            moz-user-select: -moz-none;
+            -moz-user-select: none;
+            -o-user-select:none;
+            -khtml-user-select:none;
+            -webkit-user-select:none;
+            -ms-user-select:none;
+            user-select:none;
+        }
+    </style>
+</head>
+<body style="background-repeat: round">
+<div class="page login-page">
+    <div class="container d-flex align-items-center">
+        <div class="form-holder has-shadow">
+            <div class="row">
+
+                <div class="col-lg-6">
+                    <div class="info d-flex align-items-center" tar="info">
+                        <div class="content" style="width: 100%;text-align: center;height: 100%">
+                            <div class="logo">
+                                <h1>欢迎登录</h1>
+                            </div>
+                            <div style="text-align: left">
+                                <h2>账号</h2>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果可以看到注册字样，在你没账号时可以进行注册</p>
+                                <h2>不想登录</h2>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果没有账号又懒得注册，可以之际白嫖，
+                                    <a style="background: white;padding: 2px;font-weight: 500;border-radius: 4px;" href="index.html">点这里</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6" style="background: rgba(255,255,255,0.8)">
+                    <div class="form d-flex align-items-center">
+                        <div class="content">
+                            <div class="form-validate" id="loginFrom">
+                                <div class="form-group">
+                                    <input style="padding-left: 5px;background: rgba(255,255,255,0.8);" id="login-username"
+                                           autocomplete="off" type="text" name="userName"placeholder="用户名" class="input-material">
+                                </div>
+                                <div class="form-group">
+                                    <input style="padding-left: 5px;background: rgba(255,255,255,0.8);width: calc(100% - 70px);" autocomplete="off"
+                                           id="login-password" type="password" name="passWord" placeholder="密码" class="input-material">
+                                    <a href="#" type="toggle-password" class="signup">显示密码</a>
+                                </div>
+                                <button id="login" type="login" class="btn btn-primary">登录</button>
+                            </div>
+                            <div tar="toregister" style="background: #f2f9ffd1;padding: 5px;"><small>没有账号?</small><a href="#" class="signup">&nbsp;注册</a></div>
+                            <div tar="tologin" style="display:none;background: #f2f9ffd1;padding: 5px;"><a href="#" class="signup">返回登录</a></div>
+                            <div style="background: #f2f9ffd1;padding: 5px;margin-top: 5px;">
+                                <a href="#" class="signup">背景图片来自 必应</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="./json/apis.js" charset="utf-8"></script>
+<script type="text/javascript" src="./json/Dao.js" charset="utf-8"></script>
+<script type="text/javascript" src="./json/UserDao.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/layer/3.1.1/layer.js"></script>
+
+<script>
+    $(function() {
+        let from = '';
+        if (location.search.length) {
+            from = ((location.search.split('?')[1] || '&').split('&').map(_ => (_.trim() || '=').split('=')).filter(_ => _[0] === 'from')[0] || [])[1]
+        }
+        Dao.getBingImg().then(imgs => {
+            window.bing_imgs = imgs;
+            window.bing_img_index = 0;
+            let rand = parseInt(Math.random() * imgs.length);
+            // setInterval(function () {
+            //     window.bing_img_index++;
+            //     window.bing_img_index = window.bing_img_index % window.bing_imgs.length;
+            //     document.body.style.backgroundImage = `url(${window.bing_imgs[window.bing_img_index].url})`;
+            // },5000);
+            document.body.style.backgroundImage = `url(${imgs[rand].url})`;
+        });
+        let infoDiv = $(`[tar="info"]`);
+        let toRegisterDiv = $(`[tar='toregister']`);
+        let toLoginDiv = $(`[tar='tologin']`);
+        let loginBtn = $(`[type="login"]`);
+        let userNameInput = $(`[name="userName"]`);
+        let passwordInput = $(`[name="passWord"]`);
+        let togglePasswordBtn = $(`[type="toggle-password"]`);
+        let toggleType = 'password';
+        toRegisterDiv.find('a').on('click',function () {
+            toRegisterDiv.css({display: 'none'});
+            toLoginDiv.css({display: 'block'});
+            loginBtn.text('注册');
+            infoDiv.css({background: '#ee6abfe6'});
+            infoDiv.html(`<div class="content" style="width: 100%;text-align: center;height: 100%">
+                            <div class="logo">
+                                <h1>欢迎注册</h1>
+                            </div>
+                            <div style="text-align: left">
+                                <h2>关于用户名</h2>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可以是任意字符</p>
+                                <h2>关于密码</h2>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可以是任意组合，但是请自己记住，本网址没开发找回密码功能</p>
+                                <h2>注册后能做什么</h2>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;当前只有便签功能需要注册才能使用，如果不需要这个功能，请不要注册</p>
+                            </div>
+                        </div>`);
+        });
+        toLoginDiv.find('a').on('click',function () {
+            toRegisterDiv.css({display: 'block'});
+            toLoginDiv.css({display: 'none'});
+            loginBtn.text('登录');
+            infoDiv.css({background: '#796aeee6'});
+            infoDiv.html(`<div class="content" style="width: 100%;text-align: center;height: 100%">
+                            <div class="logo">
+                                <h1>欢迎登录</h1>
+                            </div>
+                            <div style="text-align: left">
+                                <h2>账号</h2>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果可以看到注册字样，在你没账号时可以进行注册</p>
+                                <h2>不想登录</h2>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果没有账号又懒得注册，可以之际白嫖，
+                                    <a style="background: white;padding: 2px;font-weight: 500;border-radius: 4px;" href="index.html">点这里</a></p>
+                            </div>
+                        </div>`);
+        });
+        togglePasswordBtn.on('click',function () {
+            if (toggleType === 'password') {
+                toggleType = 'text';
+                togglePasswordBtn.text('隐藏密码');
+                passwordInput.attr('type','text');
+            } else {
+                toggleType = 'password';
+                togglePasswordBtn.text('显示密码');
+                passwordInput.attr('type','password');
+            }
+        });
+        loginBtn.on('click',function() {
+            if (loginBtn.text() === '登录') {
+                UserDao.login({username: userNameInput.val(),password: passwordInput.val()})
+                .then(_ => {
+                    layer.msg("登录成功");
+                    setTimeout(() => {
+                        if (from) {
+                            location.href = from;
+                        } else {
+                            location.href = "index.html";
+                        }
+                    },1000);
+                })
+            } else {
+                UserDao.register({username: userNameInput.val(),password: passwordInput.val()})
+                .then(_ => {
+                    layer.msg("注册成功，请登录");
+                    toLoginDiv.click();
+                }).catch(_ => {
+                    layer.msg(`注册发生错误:${_.message}`);
+                })
+            }
+        });
+        toLoginDiv.click();
+    });
+</script>
+</body>
+</html>

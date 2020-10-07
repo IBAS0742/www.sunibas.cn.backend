@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-WeAdmin Frame型后台管理系统-WeAdmin 1.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../static/css/font.css">
+    <link rel="stylesheet" href="../static/css/weadmin.css">
+</head>
+
+<body>
+<div class="weadmin-body">
+    <blockquote class="layui-elem-quote">测试表单顺便当作例子</blockquote>
+    <div id="form"></div>
+</div>
+</body>
+<script type="text/javascript" src="../static/js/form.js" charset="utf-8"></script>
+<script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript">
+    layui.extend({
+        admin: '{/}../static/js/admin',
+    });
+    layui.use(['jquery', 'element','util', 'admin', 'carousel','form','layer'], function() {
+        var element = layui.element,
+            $ = layui.jquery,
+            layer = layui.layer,
+            form = layui.form,
+            carousel = layui.carousel,
+            util = layui.util,
+            admin = layui.admin;
+        window.form = form;
+        window.$ = $;
+        window.myForm = new Form("form",form,layer)
+            .addFormItem(new MapInput("对象","obj","").addKeyValue("key1","value1").addKeyValue("key2","value2",true))
+            .addFormItem(
+                new Input("名称","name","请输入名称"),
+                _ => {
+                    if (!_) {
+                        return new Error("不能为空");
+                    }
+                }
+            )
+            .addFormItem(
+                new Select("所在城市","city").addOptions("beijing","北京").addOptions("shanghai","上海"),
+                _ => {
+                    if (_ === "北京") {
+                        return new Error("暂时不能选北京");
+                    }
+                }
+            )
+            .addFormItem(
+                new CheckBox("喜好","faver").addOptions("sing","唱歌").addOptions("run","跑步"),
+                _ => {
+                    if (_.length < 2) {
+                        return new Error("不能少于两个");
+                    }
+                }
+            )
+            .addFormItem(new Switch("性别","sex"))
+            .addFormItem(
+                new Radio("年龄","age").addOptions("20","20-").addOptions("40","40-").addOptions("60","60-"),
+                _ => {
+                    if (_[0] === "40") {
+                        return new Error("40- 不要")
+                    }
+                }
+            )
+            .addFormItem(
+                new TextArea("其他","other"),
+                [Form.checkDatasMethods.required(),Form.checkDatasMethods.requiredLength(10)]
+            )
+            .render();
+    });
+</script>
+
+</html>

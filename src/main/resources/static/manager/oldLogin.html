@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="./static/css/font.css">
+    <link rel="stylesheet" href="./static/css/weadmin.css">
+    <link rel="stylesheet" href="./static/css/class.css">
+</head>
+
+<body>
+<div class="class-div" style="max-width: 500px;" id="login"></div>
+</body>
+<script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="./static/js/form.js" charset="utf-8"></script>
+<script type="text/javascript" src="./json/apis.js" charset="utf-8"></script>
+<script type="text/javascript" src="./json/Dao.js" charset="utf-8"></script>
+<script type="text/javascript" src="./json/UserDao.js" charset="utf-8"></script>
+<script type="text/javascript">
+    layui.extend({
+        admin: '{/}./static/js/admin',
+    });
+    layui.use(['form','layer','jquery'], function() {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.jquery;
+        window.$ = $;
+        let from = '';
+        if (location.search.length) {
+            from = ((location.search.split('?')[1] || '&').split('&').map(_ => (_.trim() || '=').split('=')).filter(_ => _[0] === 'from')[0] || [])[1]
+        }
+        Dao.getBingImg().then(imgs => {
+            window.bing_imgs = imgs;
+            window.bing_img_index = 0;
+            let rand = parseInt(Math.random() * imgs.length);
+            // setInterval(function () {
+            //     window.bing_img_index++;
+            //     window.bing_img_index = window.bing_img_index % window.bing_imgs.length;
+            //     document.body.style.backgroundImage = `url(${window.bing_imgs[window.bing_img_index].url})`;
+            // },5000);
+            document.body.style.backgroundImage = `url(${imgs[rand].url})`;
+        });
+        let loginForm = new Form("login",form,layer,function (obj) {
+            UserDao.login(obj)
+            .then(_ => {
+                layer.msg("登录成功");
+                setTimeout(() => {
+                    if (from) {
+                        location.href = from;
+                    } else {
+                        location.href = "index.html";
+                    }
+                },1000);
+            }).catch(_ => {
+                layer.msg("登录失败：" + _.message);
+            });
+            console.log(obj);
+        },"登录").addFormItem(new Input("用户名","username","用户名"),Form.checkDatasMethods.required())
+        .addFormItem(new Input("密码","password",'密码',false,true),Form.checkDatasMethods.required())
+        .render();
+    });
+</script>
+
+</html>
