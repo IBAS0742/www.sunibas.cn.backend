@@ -27,7 +27,6 @@
             overflow: hidden;
             margin: 0;
             font-family: microsoft yahei light,microsoft yahei,PingFangSC-Regular,Helvetica,sans-serif,ç­‰çº¿;
-            /*background: url("https://cn.bing.com/th?id=OHR.YunchengSaltLake_ZH-CN2717775996_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp") no-repeat center fixed;*/
             background-size: cover;
             cursor: default;
             -webkit-tap-highlight-color: transparent;
@@ -103,7 +102,22 @@
             text-align: center;
             background-color: #ffffff80;
             cursor: pointer;
-            transition: background-color .35s;
+            transition: all .35s;
+        }
+        .customNav:hover {
+            width: 130px;
+            height: 130px;
+            margin: 0;
+            background-color: white !important;
+        }
+        .customNav:hover .cusNavIcon {
+            padding: 0 12px 25px;
+        }
+        .customNav:hover .cusNavTitle {
+            bottom: 5px;
+            color: black;
+            font-size: medium;
+            font-weight: bold;
         }
         .cusNavTitle {
             bottom: -25px;
@@ -144,19 +158,16 @@
             filter: blur(0.5px);
         }
         #presetNavsArea .cusNavIcon {
-            width: 26px;
-            height: 26px;
-            margin-top: -13px;
-            margin-left: -13px;
             border-radius: 0;
             font-size: 26px;
         }
         .cusNavIcon {
+            margin: 0px !important;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 24px;
-            height: 24px;
             margin-top: -12px;
             margin-left: -12px;
             border: none;
@@ -220,6 +231,21 @@
             background-color: rgba(32, 114, 255, 0.36);
             color: white;
         }
+        #app-detail {
+            transition: all .25s;
+            position: absolute;
+            opacity: 0;
+            left: calc(50% - 330px);
+            width: 660px;
+            height: 100px;
+            overflow: hidden;
+            background: #ffffffc4;
+            color: black;
+            font-size: 20px;
+            padding: 5px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -244,14 +270,15 @@
         <span class="searchOpt" tar="note">便签</span>
         <span class="searchOpt" tar="setting">设置</span>
     </div>
+    <div id="app-detail">hahaha</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/layer/3.1.1/layer.js"></script>
-<script src="./json/apis.js"></script>
-<script src="./json/Dao.js"></script>
-<script src="./json/PagesDao.js"></script>
-<script src="./json/UserDao.js"></script>
-<script src="./static/js/IndexPage.js"></script>
+<script src="../manager/json/apis.js"></script>
+<script src="../manager/json/Dao.js"></script>
+<script src="../manager/json/PagesDao.js"></script>
+<script src="../manager/json/UserDao.js"></script>
+<script src="./IndexPage.js"></script>
 <script>
     $(function () {
         setInterval(function () {
@@ -273,6 +300,7 @@
                 outterTab: $('[tar="outter"]'),
                 noteTab: $('[tar="note"]'),
                 settingTab: $('[tar="setting"]'),
+                appDetail: $('#app-detail'),
             });
         }
     });

@@ -1,6 +1,16 @@
 # quickSpringBootFr
 
-> 修改时间 2019年8月16日12点01分
+⭐该后台对应的静态资源在 [这里](https://github.com/IBAS0742/www.sunibas.cn.static)
+
+application.dev.properties 中的配置内容说明如下
+
+```text
+# 这里的 question 是验证是否为管理员的问题，格式为
+# 问题=md5(答案)
+globalval.QuestionFile=D:\\codes\\node\\www.sunibas.cn.static\\jsons\\question.txt
+# 这个是 后台的静态资源，位置在上面⭐说明了
+spring.resources.static-locations=classpath:/static,file:/D:/codes/node/www.sunibas.cn.static
+```
 
 - [使用文档访问这里](README.md)
 

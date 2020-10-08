@@ -61,22 +61,53 @@ class IndexPage {
             this.icons[this.icons.currentSelect].forEach(icon => {
                 let _icon = ``;
                 if (icon.image.startsWith('icon:')) {
-                    _icon = `<svg class="icon cusNavIcon" aria-hidden="true">
+                    _icon = `<div class="cusNavIcon">
+                    <svg style="width: 100%;height: 100%;padding: 10px;" class="icon" aria-hidden="true">
                     <use xlink:href="#${icon.image.substring('icon:'.length)}"></use>
-                </svg>`;
+                </svg></div>`;
                 } else if (icon.image.startsWith('image:')) {
-                    _icon = `<div class="cusNavIcon" style="margin: 0px !important;top: 0;left: 0;width: 100%;height: 100%;">
+                    _icon = `<div class="cusNavIcon">
                         <img src="${icon.image.substring('image:'.length)}" style="width: 100%;height: 100%;padding: 10px;"></img></div>`;
                 } else {
-                    _icon = `<svg class="icon cusNavIcon" aria-hidden="true">
+                    _icon = `<div class="cusNavIcon">
+                    <svg style="width: 100%;height: 100%;padding: 10px;" class="icon" aria-hidden="true">
                     <use xlink:href="#${this.icons.defaultIcon}"></use>
-                </svg>`;
+                </svg></div>`;
                 }
-                dom += `<div class="customNav shouldNotFade shouldNotSwitch added" style="background-color: ${color}">${_icon}
+                dom += `<div id="${icon.id}" class="customNav shouldNotFade shouldNotSwitch added" style="background-color: ${color}">${_icon}
                 <div class="cusNavTitle shouldNotFade shouldNotSwitch">${icon.title}</div>
             </div>`;
             });
             this.doms.presetNavsArea.html(dom);
+            $('.customNav').on('mouseover',function () {
+                let id = this.id;
+                let desc = "";
+                $this.icons[$this.icons.currentSelect].forEach(_ => {
+                    if (_.id === id) {
+                        desc = _.description;
+                    }
+                });
+                $this.doms.appDetail.css({opacity: 1});
+                $this.doms.appDetail.html(desc);
+            });
+            $('.customNav').on('mouseout',function () {
+                $this.doms.appDetail.css({opacity: 0});
+                $this.doms.appDetail.html("");
+            });
+            $('.customNav').on('click',function () {
+                let id = this.id;
+                let path = "";
+                $this.icons[$this.icons.currentSelect].forEach(_ => {
+                    if (_.id === id) {
+                        path = _.path;
+                    }
+                });
+                if (path.startsWith("http://") || path.startsWith("https://")) {
+                    window.open(path);
+                } else {
+                    window.open(scalaServer + path);
+                }
+            });
             return;
         }
         PagesDao.listAll().then(_ => {
@@ -131,12 +162,15 @@ class IndexPage {
         let $this = this;
         UserDao.checkLogin(function () {
             if (UserDao.isLogin) {
+                $this.doms.presetNavsArea.html(`<div style="width: 100%;height: 100%;color: white;">
+                    <div style="font-size: 20px;text-align: center;padding-top: 20px;">功能还没写</div>
+                </div>`);
             } else {
                 $this.doms.presetNavsArea.html(`<div style="width: 100%;height: 100%;color: white;">
                     <div tar="toLogin" style="font-size: 20px;text-align: center;padding-top: 20px;">便签需要登录，但是我功能还没写</div>
                 </div>`);
                 $this.doms.presetNavsArea.find('[tar="toLogin"]').on('click',function () {
-                    location.href = 'login.html?from=index.html';
+                    location.href = './../manager/login.html?from=./../web/index.html';
                 });
             }
         });
@@ -146,12 +180,15 @@ class IndexPage {
         let $this = this;
         UserDao.checkLogin(function () {
             if (UserDao.isLogin) {
+                $this.doms.presetNavsArea.html(`<div style="width: 100%;height: 100%;color: white;">
+                    <div style="font-size: 20px;text-align: center;padding-top: 20px;">功能还没写</div>
+                </div>`);
             } else {
                 $this.doms.presetNavsArea.html(`<div style="width: 100%;height: 100%;color: white;">
                     <div tar="toLogin" style="font-size: 20px;text-align: center;padding-top: 20px;">设置需要登录，但是我功能还没写</div>
                 </div>`);
                 $this.doms.presetNavsArea.find('[tar="toLogin"]').on('click',function () {
-                    location.href = 'login.html?from=index.html';
+                    location.href = './../manager/login.html?from=./../web/index.html';
                 });
             }
         });

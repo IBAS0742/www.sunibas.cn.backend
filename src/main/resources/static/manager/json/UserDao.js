@@ -56,11 +56,11 @@ const UserDao = new (class extends Dao {
 
     checkLogin(cb) {
         let token = sessionStorage.getItem("token");
-        if (token) {
-
+        if (this.isLogin) {
+            cb(this);
         } else {
             this.isLogin = false;
-            UserDao.info(window.token).then(_ => {
+            UserDao.info(token).then(_ => {
                 if (_.code === 200) {
                     this.userInfo = _.data;
                     this.isLogin = true;
