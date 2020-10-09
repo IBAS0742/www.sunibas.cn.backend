@@ -38,3 +38,7 @@ fetch('/table/task/listByTaskIndex', {
     }.toParamString()
 })
 ```
+
+- 3.启动配置
+
+![启动配置](./manager/static/images/启动配置.jpg)
