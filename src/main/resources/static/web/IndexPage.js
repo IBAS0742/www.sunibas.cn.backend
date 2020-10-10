@@ -67,7 +67,7 @@ class IndexPage {
                 </svg></div>`;
                 } else if (icon.image.startsWith('image:')) {
                     _icon = `<div class="cusNavIcon">
-                        <img src="${icon.image.substring('image:'.length)}" style="width: 100%;height: 100%;padding: 10px;"></img></div>`;
+                        <img src="${icon.image.substring('image:'.length).replace('{ip}',scalaServer)}" style="width: 100%;height: 100%;padding: 10px;"></img></div>`;
                 } else {
                     _icon = `<div class="cusNavIcon">
                     <svg style="width: 100%;height: 100%;padding: 10px;" class="icon" aria-hidden="true">
