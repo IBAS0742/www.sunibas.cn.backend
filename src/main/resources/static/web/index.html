@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <script src="//at.alicdn.com/t/font_2114797_y92kwe9h0w.js"></script>
+    <script src="//at.alicdn.com/t/font_2114797_d3c5564ib9f.js"></script>
     <style>
         .icon {
             width: 1em; height: 1em;
@@ -103,21 +103,6 @@
             background-color: #ffffff80;
             cursor: pointer;
             transition: all .35s;
-        }
-        .customNav:hover {
-            width: 130px;
-            height: 130px;
-            margin: 0;
-            background-color: white !important;
-        }
-        .customNav:hover .cusNavIcon {
-            padding: 0 12px 25px;
-        }
-        .customNav:hover .cusNavTitle {
-            bottom: 5px;
-            color: black;
-            font-size: medium;
-            font-weight: bold;
         }
         .cusNavTitle {
             bottom: -25px;
@@ -227,10 +212,6 @@
             background-color: #8BC34A;
             color: white;
         }
-        .searchOpt:hover {
-            background-color: rgba(32, 114, 255, 0.36);
-            color: white;
-        }
         #app-detail {
             transition: all .25s;
             position: absolute;
@@ -281,28 +262,24 @@
 <script src="./IndexPage.js"></script>
 <script>
     $(function () {
-        setInterval(function () {
+        function checkTime() {
             let d = new Date();
-            $('#titleText').text(d.getHours() + ':' + d.getMinutes());
-        },3000);
-        if (navigator.userAgent.toLowerCase().includes('linux')) {
-            layer.confirm('是否切换到移动端，否则显示将错乱', function(index){
-                layer.close(index);
-                location.href = 'index.mobile.html';
-            });
-        } else {
-            window.indexPage = new IndexPage(IndexPage.defaultSetting,{
-                body: $('body'),
-                navbox: $('#navbox'),
-                bgbox: $('#bgbox'),
-                presetNavsArea: $('#presetNavsArea'),
-                innerTab: $('[tar="inner"]'),
-                outterTab: $('[tar="outter"]'),
-                noteTab: $('[tar="note"]'),
-                settingTab: $('[tar="setting"]'),
-                appDetail: $('#app-detail'),
-            });
+            let h = d.getHours();
+            let m = d.getMinutes();
+            $('#titleText').text((h < 10 ? `0${h}`:h) + ':' + (m < 10 ? `0${m}`:m));
         }
+        setInterval(checkTime,1000);checkTime();
+        window.indexPage = new IndexPage(IndexPage.defaultSetting,{
+            body: $('body'),
+            navbox: $('#navbox'),
+            bgbox: $('#bgbox'),
+            presetNavsArea: $('#presetNavsArea'),
+            innerTab: $('[tar="inner"]'),
+            outterTab: $('[tar="outter"]'),
+            noteTab: $('[tar="note"]'),
+            settingTab: $('[tar="setting"]'),
+            appDetail: $('#app-detail'),
+        },navigator.userAgent.toLowerCase().includes('linux'));
     });
 </script>
 </body>

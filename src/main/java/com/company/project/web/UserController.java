@@ -16,10 +16,7 @@ import tk.mybatis.mapper.entity.Condition;
 import javax.annotation.Resource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
 * Created by CodeGenerator on 2020/10/05.
@@ -33,8 +30,33 @@ public class UserController {
     @Resource
     private UserService userService;
 
+    private List<String> okPassword = Arrays.asList("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,.?*!@#$%^&=+-".split(""));
+
     @PostMapping("/register")
     public Result register(User user) throws NoSuchAlgorithmException {
+        user.setUsername(user.getUsername().trim());
+        user.setPassword(user.getPassword().trim());
+        if (user.getUsername().length() < 4) {
+            return ResultGenerator.genFailResult("用户名长度小于4");
+        }
+        if (user.getPassword().length() < 4) {
+            return ResultGenerator.genFailResult("密码长度小于4");
+        }
+        boolean ok = true;
+        Set<String> noOkChar = new HashSet<>();
+        for (String s : user.getPassword().split("")) {
+            if (!okPassword.contains(s)) {
+                ok = false;
+                noOkChar.add(s);
+            }
+        }
+        if (!ok) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0;i < noOkChar.size();i++) {
+                sb.append(noOkChar.toArray()[i]);
+            }
+            return ResultGenerator.genFailResult("密码中包含了不合法的字符 [" + sb.toString() + "]");
+        }
         user.setId(UUID.randomUUID().toString());
         User u = userService.findBy("username",user.getUsername());
         if (u == null) {
