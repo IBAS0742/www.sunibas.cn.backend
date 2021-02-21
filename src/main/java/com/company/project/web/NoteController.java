@@ -3,6 +3,7 @@ import com.company.project.core.GlobalVar;
 import com.company.project.core.Result;
 import com.company.project.core.ResultGenerator;
 import com.company.project.model.Note;
+import com.company.project.model.Pages;
 import com.company.project.service.NoteService;
 import com.company.project.service.PagesService;
 import com.github.pagehelper.PageHelper;
@@ -50,7 +51,9 @@ public class NoteController {
         if (uid == null) {
             return ResultGenerator.genFailResult("请先登录");
         }
-        noteService.deleteById(id);
+        Condition condition = new Condition(Pages.class);
+        condition.createCriteria().andEqualTo("uid",uid).andEqualTo("id",id);
+        noteService.deleteByCondition(condition);
         return ResultGenerator.genSuccessResult();
     }
 
