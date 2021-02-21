@@ -42,3 +42,17 @@ fetch('/table/task/listByTaskIndex', {
 - 3.启动配置
 
 ![启动配置](./manager/static/images/启动配置.jpg)
+
+- 4.服务器端启动/停止方法
+
+```shell script
+停止方法
+ps -ef|grep java
+kill xxxx
+
+启动方法
+nohup java -jar spring-boot-api-project-seed-1.0.jar > a.log 2>&1 &
+
+查看实时日志
+tail -f a.log
+```
