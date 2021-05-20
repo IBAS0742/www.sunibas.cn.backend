@@ -63,13 +63,14 @@ public class ${modelNameUpperCamel}Controller {
     @PostMapping("/listBy")
     public Result listBy(@RequestParam Map<String,String> cond, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "0") Integer size) {
         Condition condition = new Condition(${modelNameUpperCamel}.class);
+        Example.Criteria criteria = condition.createCriteria();
         Iterator<String> keys = cond.keySet().iterator();
         while (keys.hasNext()) {
             String k = keys.next();
             if (k.equals("page") || k.equals("size")) {
                 continue;
             }
-            condition.createCriteria().andEqualTo(k,cond.get(k));
+            criteria.andEqualTo(k,cond.get(k));
         }
         PageHelper.startPage(page, size);
         List<${modelNameUpperCamel}> list = ${modelNameLowerCamel}Service.findByCondition(condition);

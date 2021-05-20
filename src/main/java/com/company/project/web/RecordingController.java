@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.Iterator;
@@ -63,13 +64,14 @@ public class RecordingController {
     @PostMapping("/listBy")
     public Result listBy(@RequestParam Map<String,String> cond, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "0") Integer size) {
         Condition condition = new Condition(Recording.class);
+        Example.Criteria criteria = condition.createCriteria();
         Iterator<String> keys = cond.keySet().iterator();
         while (keys.hasNext()) {
             String k = keys.next();
             if (k.equals("page") || k.equals("size")) {
                 continue;
             }
-            condition.createCriteria().andEqualTo(k,cond.get(k));
+            criteria.andEqualTo(k,cond.get(k));
         }
         PageHelper.startPage(page, size);
         List<Recording> list = recordingService.findByCondition(condition);
