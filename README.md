@@ -39,6 +39,31 @@ fetch('/table/task/listByTaskIndex', {
 })
 ```
 
+- 3. 使用油猴实现跨域调用
+
+```javascript
+// @grant        GM_xmlhttpRequest
+let toParamString = function(obj) {
+    // let obj = this;
+    return Object.keys(obj).map((key) => {
+        return encodeURIComponent(key) + '=' + encodeURIComponent(obj[key])
+    }).join('&');
+}
+GM_xmlhttpRequest({
+    method: 'POST',
+    url: 'http://www.sunibas.cn/table/task/listByTaskIndex',
+    //dataType: "json",
+    // data: 'words=btc:test&index=0',
+    data:{
+        taskIndex: 'draught'
+    }.toParamString(),
+    onload: function(response) {
+        console.log(response.responseText);
+    },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+});
+```
+
 - 3.启动配置
 
 ![启动配置](./manager/static/images/启动配置.jpg)
