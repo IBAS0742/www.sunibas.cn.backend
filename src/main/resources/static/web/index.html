@@ -252,9 +252,12 @@
         <span class="searchOpt" tar="setting">设置</span>
     </div>
     <div id="app-detail">hahaha</div>
+    <div style="position: absolute;bottom: 20px;text-align: center;width: 100vw;background: #551ffd2e;">
+        <a style="color: white !important;" href="https://beian.miit.gov.cn/" target="_blank">粤ICP备17071268号</a>
+    </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/layer/3.1.1/layer.js"></script>
+<script src="./../manager/lib/jquery.min.js"></script>
+<script src="./../manager/lib/layer/layer.js"></script>
 <script src="../manager/json/apis.js"></script>
 <script src="../manager/json/Dao.js"></script>
 <script src="../manager/json/PagesDao.js"></script>
@@ -262,6 +265,17 @@
 <script src="./IndexPage.js"></script>
 <script>
     $(function () {
+        if (window.sessionStorage && window.sessionStorage.getItem) {
+            if (window.sessionStorage.getItem('login')) {
+                success();
+            } else {
+                location.href = './login.html';
+            }
+        } else {
+            location.href = './login.html';
+        }
+    });
+    window.success = function () {
         function checkTime() {
             let d = new Date();
             let h = d.getHours();
@@ -280,7 +294,7 @@
             settingTab: $('[tar="setting"]'),
             appDetail: $('#app-detail'),
         },navigator.userAgent.toLowerCase().includes('linux'));
-    });
+    }
 </script>
 </body>
 </html>

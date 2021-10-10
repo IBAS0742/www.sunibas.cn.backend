@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            overflow: hidden;
+        }
+        main{
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 0; right: 0;
+            width: 800px;
+            height: 500px;
+            line-height: 2;
+            margin: auto;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, .3);
+            box-shadow: 3px 3px 6px 3px rgba(0, 0, 0, .3);
+            overflow: hidden;
+        }
+        main::before{
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 0; right: 0;
+            filter: blur(20px);
+            z-index: -1;
+            margin: -30px;
+        }
+        .formLine {
+            height: 30px;
+            line-height: 30px;
+            font-size: 25px;
+            display: flex;
+            flex-direction: row;
+            padding: 5%;
+        }
+        .formLineLabel {
+            width: 200px;
+            text-align: center;
+        }
+        .formLineInput {
+            width: calc(100% - 200px);
+        }
+        .formLineInput input {
+            border: none;
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            width: 99%;
+            height: 100%;
+            font-size: 25px;
+        }
+        .formLine button {
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            width: 100%;
+            font-size: 25px;
+            line-height: 30px;
+            height: 50px;
+            cursor: pointer;;
+        }
+    </style>
+    <script src="../manager/json/apis.js"></script>
+    <script src="../manager/json/Dao.js"></script>
+</head>
+<body>
+<main>
+    <div style="text-align: center;">
+        <h2 style="margin-bottom: 0;">加冰吧</h2>
+        <div style="text-align: right;padding: 0 5%;">
+            <a style="color: black !important;" href="https://beian.miit.gov.cn/" target="_blank">粤ICP备17071268号</a></div>
+    </div>
+    <div class="formLine">
+        <div class="formLineLabel">登录名</div>
+        <div class="formLineInput"><input type="text" id="lgName" value=""/></div>
+    </div>
+    <div class="formLine">
+        <div class="formLineLabel">登录码</div>
+        <div class="formLineInput"><input type="text" id="lgNum" value=""/></div>
+    </div>
+    <div class="formLine">
+        <button id="lgBtn">登录</button>
+    </div>
+    <div style="padding: 0 5%;">本网站是个人网站，不含有企业、单位等非个人网站的信息，本站内容为我本人平时收集的网站链接和个人上传的用于工作学习用到的小工具。</div>
+</main>
+<div id="loginBtn" style="width: 50px;height: 50px;position:absolute;z-index: 10000;left: 0;bottom: 0;opacity: 0;"></div>
+<div id="info" style="display:none;position:absolute;top: 0;left: 0;width: 100vw;height: 100vh;z-index: 100000;background: rgba(255,255,255,0.5);padding: 49% 0;text-align:center;font-size: 30px;">
+    登录中
+</div>
+</body>
+<script>
+    window.info = null;
+    window.loginIngN = 0;
+    window.loginIng = ['登录中','登录中.','登录中..','登录中...','登录中....'];
+    window.loginIngId = null;
+    window.showInfo = function (msg,time) {
+        window.info.innerText = msg;
+        window.info.style.display = 'block';
+        if (time) {
+            setTimeout(() => {
+                window.info.style.display = 'none';
+            },time);
+        }
+    };
+    window.showLoginAni = function () {
+        clearInterval(window.loginIngId);
+        window.loginIngN = 0;
+        window.loginIngId = setInterval(() => {
+            window.loginIngN++;
+            window.loginIngN %= window.loginIng.length;
+            window.showInfo(window.loginIng[window.loginIngN]);
+        },500);
+    };
+    window.onload = function () {
+        window.info = document.getElementById('info');
+        Dao.getBingImg().then(_ => {
+            let rnd = parseInt(Math.random() * _.length);
+            document.head.innerHTML += `<style>
+body,main:before {
+            background: url("${_[rnd].url}")  0 / cover fixed;
+        }
+</style>`
+        });
+        document.getElementById('lgBtn').onclick = function () {
+            let lgName = document.getElementById('lgName').value;
+            let lgNum = document.getElementById('lgNum').value;
+            if (lgName && lgNum) {
+                window.showLoginAni();
+                fetch("").then(_ => {
+                    setTimeout(() => {
+                        clearInterval(window.loginIngId);
+                        window.showInfo("登录信息错误",3000);
+                    },3000);
+                });
+            } else {
+                window.showInfo("请填写信息后登录",3000);
+            }
+        };
+        document.getElementById('loginBtn').onclick = function () {
+            sessionStorage.setItem('login','a');
+            location.href = './index.html';
+        };
+    }
+</script>
+</html>

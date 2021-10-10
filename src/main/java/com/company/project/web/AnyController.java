@@ -21,4 +21,10 @@ public class AnyController {
     public String add(String str) {
         return str;
     }
+
+    @GetMapping("dely")
+    public String dely() throws InterruptedException {
+        Thread.sleep(1000 * 60 * 3);
+        return "ok";
+    }
 }
