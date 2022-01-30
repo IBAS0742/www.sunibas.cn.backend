@@ -33,13 +33,14 @@ public class PagesController {
     private PagesService pagesService;
 
     @PostMapping("/add")
-    public Result add(Pages pages,String token) {
-        if (!globalVar.checkAdmin(token)) {
+    public Result add(PageToken pt) {
+        if (!globalVar.checkAdmin(pt.getToken())) {
             return ResultGenerator.genFailResult("无权限");
         }
-        pages.setId(UUID.randomUUID().toString());
-        pagesService.save(pages);
-        return ResultGenerator.genSuccessResult(pages);
+        Pages p = pt.getPages();
+        p.setId(UUID.randomUUID().toString());
+        pagesService.save(p);
+        return ResultGenerator.genSuccessResult(p);
     }
 
     @PostMapping("/delete")
@@ -52,11 +53,11 @@ public class PagesController {
     }
 
     @PostMapping("/update")
-    public Result update(Pages pages,String token) {
-        if (!globalVar.checkAdmin(token)) {
+    public Result update(PageToken pt) {
+        if (!globalVar.checkAdmin(pt.getToken())) {
             return ResultGenerator.genFailResult("无权限");
         }
-        pagesService.update(pages);
+        pagesService.update(pt.getPages());
         return ResultGenerator.genSuccessResult();
     }
 
@@ -96,5 +97,127 @@ public class PagesController {
         List<Pages> list = pagesService.findByCondition(condition);
         PageInfo pageInfo = new PageInfo(list);
         return ResultGenerator.genSuccessResult(pageInfo);
+    }
+}
+class PageToken {
+    String token;
+    private String id;
+
+    private String path;
+
+    private String filenam;
+
+    private String description;
+    private String image;
+    private String tags;
+    private String type;
+    private String title;
+
+    /**
+     * @return id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return path
+     */
+    public String getPath() {
+        return path;
+    }
+
+    /**
+     * @param path
+     */
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    /**
+     * @return filenam
+     */
+    public String getFilenam() {
+        return filenam;
+    }
+
+    /**
+     * @param filenam
+     */
+    public void setFilenam(String filenam) {
+        this.filenam = filenam;
+    }
+
+    /**
+     * @return description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+    public Pages getPages() {
+        Pages p = new Pages();
+        p.setId(this.id);
+        p.setDescription(this.description);
+        p.setFilenam(this.filenam);
+        p.setPath(this.path);
+        p.setImage(this.image);
+        p.setTags(this.tags);
+        p.setTitle(this.title);
+        p.setType(this.type);
+        return p;
     }
 }

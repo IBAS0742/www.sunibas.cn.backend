@@ -63,7 +63,8 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
                                 regex("/utils/.*"),
                                 regex("/user/.*"),
                                 regex("/pages/.*"),
-                                regex("/recording/.*")
+                                regex("/recording/.*"),
+                                regex("/api/.*")
                         )
                 )//过滤的接口
                 .build()

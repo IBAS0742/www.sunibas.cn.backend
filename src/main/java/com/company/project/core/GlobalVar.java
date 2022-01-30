@@ -19,6 +19,7 @@ public class GlobalVar {
     // 这里有一些问题，只有我才能知道答案
     private Map<String,String> adminQuestion = new HashMap<>(); // uid,token
     Random r = new Random();
+    private List<String> tokenList = new ArrayList<>();
 
     public String getQuestionFile() {
         return QuestionFile;
@@ -55,7 +56,12 @@ public class GlobalVar {
         loginUsersMap.put(userid,token);
     }
     public String getUserId(String token) {
-        return loginUsers.get(token);
+        String id = loginUsers.get(token);
+        if (id == null) {
+            return "";
+        } else {
+            return id;
+        }
     }
     public String md5(String word) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("md2");
@@ -68,7 +74,7 @@ public class GlobalVar {
             LastQuestion = keys[r.nextInt(keys.length)].toString();
             return LastQuestion;
         } else {
-            return "暂时没有问题";
+            return "暂时无法登录管理员";
         }
     }
     public void InitAdminQuestion() {

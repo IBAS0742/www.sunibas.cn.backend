@@ -2,6 +2,8 @@
 
 ⭐该后台对应的静态资源在 [这里](https://github.com/IBAS0742/www.sunibas.cn.static)
 
+[最新版前端在这里](https://gitee.com/IBAS0742/my-web-pages-and-base-source)
+
 application.dev.properties 中的配置内容说明如下
 
 ```text
@@ -76,7 +78,7 @@ ps -ef|grep java
 kill xxxx
 
 启动方法
-nohup java -jar spring-boot-api-project-seed-1.0.jar > a.log 2>&1 &
+nohup java -jar spring-boot-api-project-seed-1.0.jar --server.port=39000 > a.log 2>&1 &
 
 查看实时日志
 tail -f a.log

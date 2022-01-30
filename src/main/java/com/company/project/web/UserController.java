@@ -2,7 +2,9 @@ package com.company.project.web;
 import com.company.project.core.GlobalVar;
 import com.company.project.core.Result;
 import com.company.project.core.ResultGenerator;
+import com.company.project.model.Question;
 import com.company.project.model.User;
+import com.company.project.service.QuestionService;
 import com.company.project.service.UserService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -30,7 +32,49 @@ public class UserController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private QuestionService questionService;
+
     private List<String> okPassword = Arrays.asList("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,.?*!@#$%^&=+-".split(""));
+
+    @PostMapping("/checkLogin")
+    public Result checkLogin(String token) {
+        String id = globalVar.getUserId(token);
+        if (null == id || id.isEmpty()) {
+            return ResultGenerator.genSuccessResult("").setMessage("未登录");
+        } else {
+            return ResultGenerator.genSuccessResult(id).setMessage("已登录");
+        }
+    }
+
+    @PostMapping("/checkAdmin")
+    public Result checkAdmin(String token) {
+        if (globalVar.checkAdmin(token)) {
+            return ResultGenerator.genSuccessResult("");
+        } else {
+            return ResultGenerator.genFailResult("请先授权");
+        }
+    }
+
+    @PostMapping("/getAdminQuestion")
+    public Result getAdminQuestion(String token) {
+        if (globalVar.getUserId(token).isEmpty()) {
+            return ResultGenerator.genSuccessResult("").setMessage("未登录");
+        }
+        Question q = questionService.RandSelect();
+        q.setAnswer("");
+        return new Result().setData(q);
+    }
+    @PostMapping("/checkAdminQuestion")
+    public Result checkAdminQuestion(Question question,String token) throws NoSuchAlgorithmException {
+        Question q = questionService.findById(question.getId());
+        if (q.getAnswer().equals(globalVar.md5(question.getAnswer()))) {
+            globalVar.setAdminToken(token);
+            return new Result().setMessage("admin");
+        } else {
+            return new Result().setMessage("no admin");
+        }
+    }
 
     @PostMapping("/register")
     public Result register(User user) throws NoSuchAlgorithmException {
@@ -79,6 +123,7 @@ public class UserController {
             user = us.get(0);
             globalVar.addLoginUser(token,user.getId());
             user.setId(token);
+            user.setPassword("");
 //            if (user.getUsername().equals(globalVar.getAdminUserName())) {
 //                globalVar.setAdminToken(token);
 //            }
